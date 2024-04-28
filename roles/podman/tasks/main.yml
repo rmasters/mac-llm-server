@@ -1,23 +1,30 @@
 - name: Install Podman Desktop
   community.general.homebrew:
-    name: "{{ item }}"
+    name: homebrew/cask/podman-desktop
     state: present
-  loop:
-    - podman
-    - homebrew/cask/podman-desktop
 
-- name: Run Podman on boot
-  community.general.shell:
-    cmd: brew services start podman
+- name: Install Podman CLI
+  community.general.homebrew:
+    name: podman
+    state: present
+    install_options:
+      - '--formula'
 
-- name: Create a Podman machine
-  ansible.general.shell:
-    cmd: podman machine init
+# TODO: This is implemented by Podman desktop
+#- name: Run Podman on boot
+#  ansible.builtin.shell:
+#    cmd: brew services start podman
+
+- name: Create a Podman machine, with a home-directory mount
+  ansible.builtin.shell:
+    cmd: podman machine init --volume "$HOME:$HOME"
+  ignore_errors: true  # TODO: Trap Error: podman-machine-default: VM already exists
 
 # TODO: Does this vm start on podman service start?
 - name: Start the Podman machine
-  ansible.general.shell:
+  ansible.builtin.shell:
     cmd: podman machine start
+  ignore_errors: true  # TODO: Error: unable to start "podman-machine-default": machine podman-machine-default: VM already running or starting"
 
 # TODO: Consider installing the docker-host helper
 # The system helper service is not installed; the default Docker API socket

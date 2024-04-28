@@ -2,12 +2,17 @@
   community.general.homebrew:
     name: ollama
     state: present
+    install_options:
+      - '--formula'
+  ignore_errors: true  # TODO: Work out how to skip 0-exit-code warning about the cask version
 
 - name: Set Ollama environment variables
-  community.general.shell:
+  ansible.builtin.shell:
     cmd: "launchctl setenv OLLAMA_HOST {{ ollama_host }}"
+  notify:
+    - Restart Ollama
 
 # Using Homebrew services for now, maybe we'll use a custom plist later
 - name: Register as a launchd service
-  community.general.shell:
+  ansible.builtin.shell:
     cmd: brew services start ollama

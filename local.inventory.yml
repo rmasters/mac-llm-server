@@ -1,0 +1,8 @@
+ollama:
+  hosts:
+    localhost:
+      ansible_connection: local
+open-webui:
+  hosts:
+    localhost:
+      ansible_connection: local

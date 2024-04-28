@@ -1,2 +1,11 @@
 ---
-- name: Install Homebrew
+- hosts: ollama
+  roles:
+    - role: roles/homebrew
+    - role: roles/ollama
+
+- hosts: open-webui
+  roles:
+    - role: roles/homebrew
+    - role: roles/podman
+    - role: roles/open-webui

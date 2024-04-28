@@ -33,7 +33,7 @@ Open WebUI ships with a container image, but it [seems like Apple Silicon GPUs a
 4.  Install dependencies: `pip install requirements.lock`
     *   Contrary to the Ansible docs, the `ansible` package should contain the `community.general` and `containers.podman` collections. Report an issue if not.
 5.  If you are running Ansible on the same machine you want to run Ollama on, simply run:  
-    `ansible-playbook --connection=local --inventory=localhost playbooks/install.yml`
+    `ansible-playbook -K -i local.inventory.yml playbooks/install.yml`
 6.  If the target machine is another computer on your network, ensure you can access it via SSH, and run:  
     `ansible-playbook --inventory=192.168.1.x --user=ssh_user playbooks/install.yml`  
     (where `192.168.1.x` and `ssh_user` are the IP address and remote user of the target machine respectively).
