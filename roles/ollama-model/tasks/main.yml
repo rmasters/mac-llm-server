@@ -1,0 +1,8 @@
+- name: Check required variables are set
+  assert:
+    that:
+      - model_name is defined
+
+- name: Pull a model
+  ansible.builtin.shell:
+    cmd: "ollama pull {{ model_name }}"

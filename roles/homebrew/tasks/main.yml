@@ -1,0 +1,27 @@
+- name: Install xcode command line tools
+  ansible.builtin.shell:
+    cmd: xcode-select --install
+    creates: /Library/Developer/CommandLineTools/usr/bin/clang
+    become: true
+
+- name: Download Homebrew installer
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+    dest: /tmp/homebrew-install.sh
+    mode: ugo+rx
+
+- name: Install Homebrew
+  ansible.builtin.shell:
+    cmd: NONINTERACTIVE=1 /tmp/homebrew-install.sh
+    args:
+      executable: /bin/bash
+      creates: /opt/homebrew/bin/brew
+    become: true
+
+- name: Update Homebrew
+  ansible.builtin.homebrew:
+    update_homebrew: true
+
+- name: Upgrade all Homebrew packages
+  ansible.builtin.homebrew:
+    upgrade_all: true

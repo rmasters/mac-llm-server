@@ -1,0 +1,27 @@
+- name: Install Podman Desktop
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - podman
+    - homebrew/cask/podman-desktop
+
+- name: Run Podman on boot
+  community.general.shell:
+    cmd: brew services start podman
+
+- name: Create a Podman machine
+  ansible.general.shell:
+    cmd: podman machine init
+
+# TODO: Does this vm start on podman service start?
+- name: Start the Podman machine
+  ansible.general.shell:
+    cmd: podman machine start
+
+# TODO: Consider installing the docker-host helper
+# The system helper service is not installed; the default Docker API socket
+# address can't be used by podman. If you would like to install it, run the following commands:
+#
+#         sudo /opt/homebrew/Cellar/podman/5.0.2/bin/podman-mac-helper install
+#         podman machine stop; podman machine start

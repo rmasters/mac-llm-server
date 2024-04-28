@@ -1,0 +1,13 @@
+- name: Install Ollama
+  community.general.homebrew:
+    name: ollama
+    state: present
+
+- name: Set Ollama environment variables
+  community.general.shell:
+    cmd: "launchctl setenv OLLAMA_HOST {{ ollama_host }}"
+
+# Using Homebrew services for now, maybe we'll use a custom plist later
+- name: Register as a launchd service
+  community.general.shell:
+    cmd: brew services start ollama
