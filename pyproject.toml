@@ -6,7 +6,7 @@ authors = [
     { name = "Ross Masters", email = "ross@rossmasters.com" }
 ]
 dependencies = [
-    "ansible>=9.5.1",
+    "ansible",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
