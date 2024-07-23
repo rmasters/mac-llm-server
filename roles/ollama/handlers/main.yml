@@ -1,3 +1,0 @@
-- name: Restart Ollama
-  ansible.builtin.shell:
-    cmd: brew services restart ollama

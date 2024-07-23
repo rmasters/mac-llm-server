@@ -1,11 +1,17 @@
 ---
+- name: Configure host
+  hosts: all
+  roles:
+    - role: elliotweiser.osx-command-line-tools
+    - role: geerlingguy.mac.homebrew
+      tags:
+        - homebrew
+
 - hosts: ollama
   roles:
-    - role: roles/homebrew
     - role: roles/ollama
 
 - hosts: open-webui
   roles:
-    - role: roles/homebrew
     - role: roles/podman
     - role: roles/open-webui

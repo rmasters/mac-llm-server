@@ -16,5 +16,6 @@
       ANONYMIZED_TELEMETRY: 'False'
     label:
       io.containers.autoupdate: registry
+    executable: /opt/homebrew/bin/podman
     #volumes:
     #  - 'open-webui-data:/app/backend/data:z'

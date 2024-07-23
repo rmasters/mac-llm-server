@@ -1,34 +1,50 @@
-- name: Install Podman Desktop
+#
+# This has been very flaky to test. Suggested commands to run if experiencing issues:
+# - podman machine rm podman-machine-default
+# - podman system configuration rm ...
+#
+
+#- name: Install Podman Desktop
+#  community.general.homebrew:
+#    name: homebrew/cask/podman-desktop
+#    state: present
+
+- name: Install JQ
   community.general.homebrew:
-    name: homebrew/cask/podman-desktop
+    name: jq
     state: present
 
 - name: Install Podman CLI
   community.general.homebrew:
     name: podman
     state: present
-    install_options:
-      - '--formula'
+    force_formula: true
 
-# TODO: This is implemented by Podman desktop
-#- name: Run Podman on boot
-#  ansible.builtin.shell:
-#    cmd: brew services start podman
-
-- name: Create a Podman machine, with a home-directory mount
+- name: Install docker-host helper
   ansible.builtin.shell:
-    cmd: podman machine init --volume "$HOME:$HOME"
-  ignore_errors: true  # TODO: Trap Error: podman-machine-default: VM already exists
+    cmd: /opt/homebrew/bin/podman-mac-helper install
+  become: true
 
-# TODO: Does this vm start on podman service start?
+- name: Check if machine exists
+  ansible.builtin.shell:
+    cmd: /opt/homebrew/bin/podman machine inspect | /opt/homebrew/bin/jq -r 'select(.[].Name == "{{ podman_machine_name }}") | length'
+  register: podman_machine_exists
+
+- name: Create a Podman machine
+  ansible.builtin.shell:
+    cmd: /opt/homebrew/bin/podman machine init --now  # --volume "$HOME:$HOME"
+  register: podman_machine_init
+  failed_when: 'podman_machine_init.rc != 0 and "VM already exists" not in podman_machine_init.stderr'
+  when: podman_machine_exists.stdout == "0"
+
+- name: Check if machine running
+  ansible.builtin.shell:
+    cmd: /opt/homebrew/bin/podman machine inspect | /opt/homebrew/bin/jq -r '.[] | select(.Name == "podman-machine-default") | .State'
+  register: podman_machine_state
+
 - name: Start the Podman machine
   ansible.builtin.shell:
-    cmd: podman machine start
-  ignore_errors: true  # TODO: Error: unable to start "podman-machine-default": machine podman-machine-default: VM already running or starting"
-
-# TODO: Consider installing the docker-host helper
-# The system helper service is not installed; the default Docker API socket
-# address can't be used by podman. If you would like to install it, run the following commands:
-#
-#         sudo /opt/homebrew/Cellar/podman/5.0.2/bin/podman-mac-helper install
-#         podman machine stop; podman machine start
+    cmd: /opt/homebrew/bin/podman machine start --no-info --quiet
+  register: podman_machine_start
+  failed_when: 'podman_machine_start.rc != 0 and "VM already running or starting" not in podman_machine_start.stderr'
+  when: podman_machine_state.stdout != "running"
